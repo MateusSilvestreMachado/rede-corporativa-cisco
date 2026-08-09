@@ -8,20 +8,21 @@ Simulação de uma infraestrutura de rede corporativa em dois prédios, projetad
 
 ## 📑 Sumário
 
-- [Objetivo do laboratório](#-objetivo-do-laboratório)
-- [Visão geral da topologia](#-visão-geral-da-topologia)
-- [Mapeamento de endereçamento e VLANs](#-mapeamento-de-endereçamento-e-vlans)
-- [Decisões de design](#-decisões-de-design)
-- [Estrutura do repositório](#-estrutura-do-repositório)
-- [Como abrir e testar o projeto](#-como-abrir-e-testar-o-projeto)
-- [Roteiro de validação](#-roteiro-de-validação)
-- [Comandos úteis de troubleshooting](#-comandos-úteis-de-troubleshooting)
-- [Melhorias futuras](#-melhorias-futuras)
-- [Autor](#-autor)
-- [Licença](#-licença)
+- [Objetivo do laboratório](#objetivo)
+- [Visão geral da topologia](#topologia)
+- [Mapeamento de endereçamento e VLANs](#enderecamento)
+- [Decisões de design](#decisoes)
+- [Estrutura do repositório](#estrutura)
+- [Como abrir e testar o projeto](#como-abrir)
+- [Roteiro de validação](#validacao)
+- [Comandos úteis de troubleshooting](#troubleshooting)
+- [Melhorias futuras](#melhorias)
+- [Autor](#autor)
+- [Licença](#licenca)
 
 ---
 
+<a id="objetivo"></a>
 ## 🎯 Objetivo do laboratório
 
 Simular a rede de uma empresa com matriz (Prédio 1) e filial (Prédio 2), cada uma com três departamentos (RH, Vendas e Financeiro) isolados logicamente, garantindo:
@@ -31,6 +32,7 @@ Simular a rede de uma empresa com matriz (Prédio 1) e filial (Prédio 2), cada 
 - **Atribuição automática de IP** para os hosts de qualquer departamento, mesmo com o servidor DHCP fisicamente localizado em outra VLAN (DHCP Relay).
 - **Serviços de rede centralizados** (DNS interno e portal Web) acessíveis por toda a empresa.
 
+<a id="topologia"></a>
 ## 📐 Visão geral da topologia
 
 ```
@@ -66,6 +68,7 @@ Simular a rede de uma empresa com matriz (Prédio 1) e filial (Prédio 2), cada 
 - **Core L3 redundante:** em cada prédio, dois switches multilayer compartilham o papel de gateway via HSRP — se o ativo falhar, o standby assume de forma transparente para os hosts.
 - **Interligação:** os dois prédios se conectam via link serial ponto a ponto entre roteadores de borda, com OSPF garantindo a troca de rotas entre todos os segmentos.
 
+<a id="enderecamento"></a>
 ## 🗺️ Mapeamento de endereçamento e VLANs
 
 | Local | VLAN | Nome | Sub-rede | Gateway Virtual (HSRP) |
@@ -89,6 +92,7 @@ Simular a rede de uma empresa com matriz (Prédio 1) e filial (Prédio 2), cada 
 
 > ⚠️ **Nota de projeto:** a VLAN 100 existe nos dois prédios, mas em sub-redes diferentes (`192.168.100.0/24` no Prédio 1 e `192.168.110.0/24` no Prédio 2). O servidor físico documentado está apenas no Prédio 1 — a VLAN 100 do Prédio 2 está preparada como segmento reservado para servidores locais da filial, mas ainda não tem host configurado nela.
 
+<a id="decisoes"></a>
 ## 🧠 Decisões de design
 
 **Por que switches de Camada 3 (multilayer) fazendo o roteamento inter-VLAN, em vez de um router-on-a-stick?**
@@ -106,6 +110,7 @@ Centralizar o DHCP em um único servidor (na VLAN 100) simplifica a administraç
 **Por que `passive-interface` nas VLANs de host?**
 Evita que o switch envie pacotes de hello do OSPF para as portas de acesso dos usuários finais — essas redes só precisam ser *anunciadas*, nunca formar vizinhança OSPF com um host comum.
 
+<a id="estrutura"></a>
 ## 📂 Estrutura do repositório
 
 ```
@@ -133,6 +138,7 @@ enterprise-network-lab/
 
 Os arquivos em `configs/` reorganizam, por dispositivo, as mesmas configurações documentadas nos PDFs em `docs/` — a ideia é que quem quiser reproduzir o laboratório não precise garimpar comandos espalhados em texto corrido, mas copiar/colar a configuração de um equipamento por vez, direto no Packet Tracer.
 
+<a id="como-abrir"></a>
 ## ▶️ Como abrir e testar o projeto
 
 **Pré-requisitos:** [Cisco Packet Tracer](https://www.netacad.com/courses/packet-tracer) (gratuito mediante cadastro na Cisco Networking Academy).
@@ -141,6 +147,7 @@ Os arquivos em `configs/` reorganizam, por dispositivo, as mesmas configuraçõe
 2. Aguarde alguns segundos para os protocolos convergirem (OSPF formando vizinhança, HSRP elegendo o ativo) — os links passam de laranja para verde no diagrama.
 3. Clique em qualquer PC de um departamento e confirme, na aba Desktop → IP Configuration, que ele recebeu IP via DHCP automaticamente.
 
+<a id="validacao"></a>
 ## ✅ Roteiro de validação
 
 1. **DHCP:** em um PC cliente, abra o Prompt de Comando e rode `ipconfig /renew` — confirme que o IP recebido está na faixa correta do departamento e que o gateway/DNS batem com a tabela de endereçamento acima.
@@ -149,6 +156,7 @@ Os arquivos em `configs/` reorganizam, por dispositivo, as mesmas configuraçõe
 4. **Failover do HSRP:** desligue (`shutdown`) a interface VLAN ativa no switch multilayer primário de um prédio e confirme, com `ping` contínuo de um host daquele departamento, que a perda de pacotes é mínima/nula durante a troca para o switch standby.
 5. **Convergência do OSPF:** derrube um dos links redundantes entre um switch multilayer e o roteador de borda e confirme, com `show ip route`, que o tráfego é automaticamente redirecionado pelo outro caminho.
 
+<a id="troubleshooting"></a>
 ## 🔧 Comandos úteis de troubleshooting
 
 ```
@@ -160,6 +168,7 @@ show vlan brief                ! VLANs criadas e portas associadas
 show ip dhcp binding           ! Leases de IP concedidos pelo servidor DHCP
 ```
 
+<a id="melhorias"></a>
 ## 🚀 Melhorias futuras
 
 - [ ] Adicionar um segundo servidor DNS/DHCP secundário para redundância de serviços (hoje o servidor central é ponto único de falha).
@@ -168,11 +177,13 @@ show ip dhcp binding           ! Leases de IP concedidos pelo servidor DHCP
 - [ ] Adicionar VLAN de gerência dedicada e habilitar SSH nos switches/roteadores (hoje a gestão é via console).
 - [ ] Popular o segmento de servidores do Prédio 2 (VLAN 100 / 192.168.110.0/24) com um servidor local, reduzindo a dependência do link WAN para serviços básicos da filial.
 
+<a id="autor"></a>
 ## 👤 Autor
 
 **Mateus Silvestre Machado**
 Projeto de laboratório em Redes de Computadores — Cisco Packet Tracer.
 
+<a id="licenca"></a>
 ## 📄 Licença
 
 Este projeto está sob a licença MIT — veja o arquivo [LICENSE](LICENSE).
