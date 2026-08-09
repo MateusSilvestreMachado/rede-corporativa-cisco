@@ -1,0 +1,12 @@
+# Arquivos temporários do Packet Tracer
+*.pkz
+*~
+*.tmp
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

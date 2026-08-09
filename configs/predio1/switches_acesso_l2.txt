@@ -1,0 +1,51 @@
+! ============================================
+! Switches de Acesso (Camada 2) - Prédio 1
+! Switch 0 = HR (VLAN 10) | Switch 1 = SALES (VLAN 20) | Switch 2 = FINANCE (VLAN 30)
+! ============================================
+
+! --- Configuração COMUM aos Switches 0, 1 e 2 ---
+! Uplinks em trunk carregando as 3 VLANs de departamento + VLAN 100 (servidores)
+configure terminal
+interface range fa0/1-2
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30
+
+interface range fastEthernet 0/1-2
+ switchport mode trunk
+ switchport trunk allowed vlan add 100
+
+
+! ============================================
+! Switch 0 - VLAN 10 (HR)
+! ============================================
+configure terminal
+vlan 10
+ name HR
+
+interface range f0/3-24
+ switchport mode access
+ switchport access vlan 10
+
+
+! ============================================
+! Switch 1 - VLAN 20 (SALES)
+! ============================================
+configure terminal
+vlan 20
+ name SALES
+
+interface range f0/3-24
+ switchport mode access
+ switchport access vlan 20
+
+
+! ============================================
+! Switch 2 - VLAN 30 (FINANCE)
+! ============================================
+configure terminal
+vlan 30
+ name FINANCE
+
+interface range f0/3-24
+ switchport mode access
+ switchport access vlan 30

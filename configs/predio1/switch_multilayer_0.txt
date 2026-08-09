@@ -1,0 +1,91 @@
+! ============================================
+! Switch Multilayer 0 - Prédio 1 (HQ)
+! Papel: Core L3 ativo (HSRP priority mais alta nas VLANs 10/20/30)
+! ============================================
+
+configure terminal
+
+! --- Trunks para os switches de acesso (VLANs de departamento) ---
+interface range fa0/1-3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20,30
+
+! --- Trunk adicional + uplink para a zona de servidores (VLAN 100) ---
+interface range fastEthernet 0/1-3, gigabitEthernet 0/2
+ switchport mode trunk
+ switchport trunk allowed vlan add 100
+
+! --- VLANs locais ---
+vlan 10
+ name HR
+vlan 20
+ name SALES
+vlan 30
+ name FINANCE
+vlan 100
+ name SERVERS
+
+! --- Interfaces VLAN (SVIs) - Departamentos ---
+interface vlan 10
+ ip address 192.168.10.2 255.255.255.0
+ no shutdown
+ standby 10 ip 192.168.10.1
+ standby 10 priority 110
+ standby 10 preempt
+
+interface vlan 20
+ ip address 192.168.20.2 255.255.255.0
+ no shutdown
+ standby 20 ip 192.168.20.1
+ standby 20 priority 110
+ standby 20 preempt
+
+interface vlan 30
+ ip address 192.168.30.2 255.255.255.0
+ no shutdown
+ standby 30 ip 192.168.30.1
+ standby 30 priority 110
+ standby 30 preempt
+
+! --- Relay de DHCP: encaminha broadcasts para o servidor central ---
+interface vlan 10
+ ip helper-address 192.168.100.10
+interface vlan 20
+ ip helper-address 192.168.100.10
+interface vlan 30
+ ip helper-address 192.168.100.10
+
+! --- SVI da VLAN de Servidores ---
+interface vlan 100
+ ip address 192.168.100.2 255.255.255.0
+ standby 100 ip 192.168.100.1
+ standby 100 priority 210
+ standby 100 preempt
+ no shutdown
+
+! --- Porta de acesso do servidor físico ---
+interface fastEthernet 0/24
+ switchport mode access
+ switchport access vlan 100
+
+! --- Roteamento L3 entre switches de core (link ponto a ponto) ---
+interface g0/1
+ no switchport
+ ip address 10.10.1.2 255.255.255.252
+ no shutdown
+
+ip routing
+
+! --- OSPF ---
+router ospf 1
+ network 10.10.1.0 0.0.0.3 area 0
+ network 10.10.1.4 0.0.0.3 area 0
+ network 192.168.10.0 0.0.0.255 area 0
+ network 192.168.20.0 0.0.0.255 area 0
+ network 192.168.30.0 0.0.0.255 area 0
+ network 192.168.100.0 0.0.0.255 area 0
+ passive-interface vlan 10
+ passive-interface vlan 20
+ passive-interface vlan 30
+ passive-interface vlan 100

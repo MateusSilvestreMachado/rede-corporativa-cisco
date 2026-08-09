@@ -1,0 +1,26 @@
+! ============================================
+! Router de Borda - Prédio 2
+! Conecta o core L3 do Prédio 2 ao enlace WAN Serial com o Prédio 1
+! ============================================
+
+configure terminal
+
+interface g0/1
+ ip address 10.10.2.1 255.255.255.252
+ no shutdown
+
+interface g0/0
+ ip address 10.10.2.5 255.255.255.252
+ no shutdown
+
+interface s0/0/0
+ ip address 10.10.10.2 255.255.255.252
+ no shutdown
+
+router ospf 1
+ network 10.10.2.0 0.0.0.3 area 0
+ network 10.10.2.4 0.0.0.3 area 0
+ network 10.10.10.0 0.0.0.3 area 0
+
+! NOTA: o clock rate do enlace Serial é fornecido pela ponta DCE
+! (Router Prédio 1, s0/0/0). Este lado (DTE) não precisa de clock rate.

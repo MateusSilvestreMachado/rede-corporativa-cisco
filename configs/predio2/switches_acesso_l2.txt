@@ -1,0 +1,47 @@
+! ============================================
+! Switches de Acesso (Camada 2) - Prédio 2
+! Switch 3 = HR (VLAN 40) | Switch 4 = SALES (VLAN 50) | Switch 5 = FINANCE (VLAN 60)
+! ============================================
+
+! --- Configuração COMUM aos Switches 3, 4 e 5 ---
+! Uplinks em trunk carregando as 3 VLANs de departamento + VLAN 100 (servidores)
+configure terminal
+interface range fa0/1-2
+ switchport mode trunk
+ switchport trunk allowed vlan 40,50,60
+
+interface range fastEthernet 0/1-2
+ switchport mode trunk
+ switchport trunk allowed vlan add 100
+
+
+! ============================================
+! Switch 3 - VLAN 40 (HR)
+! ============================================
+configure terminal
+vlan 40
+ name HR
+
+
+! ============================================
+! Switch 4 - VLAN 50 (SALES)
+! ============================================
+configure terminal
+vlan 50
+ name SALES
+
+
+! ============================================
+! Switch 5 - VLAN 60 (FINANCE)
+! ============================================
+configure terminal
+vlan 60
+ name FINANCE
+
+! NOTA: os documentos originais não detalham explicitamente o bloco
+! "interface range f0/3-24 / switchport access vlan X" para os Switches
+! 3, 4 e 5 (como fizeram para os Switches 0, 1 e 2 do Prédio 1). Ao
+! reproduzir o laboratório, aplique o mesmo padrão do Prédio 1:
+! interface range f0/3-24
+!  switchport mode access
+!  switchport access vlan <40|50|60>

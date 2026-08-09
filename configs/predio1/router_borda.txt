@@ -1,0 +1,24 @@
+! ============================================
+! Router de Borda - Prédio 1
+! Conecta o core L3 do Prédio 1 ao enlace WAN Serial com o Prédio 2
+! ============================================
+
+configure terminal
+
+interface g0/1
+ ip address 10.10.1.1 255.255.255.252
+ no shutdown
+
+interface g0/0
+ ip address 10.10.1.5 255.255.255.252
+ no shutdown
+
+interface s0/0/0
+ ip address 10.10.10.1 255.255.255.252
+ clock rate 64000
+ no shutdown
+
+router ospf 1
+ network 10.10.1.0 0.0.0.3 area 0
+ network 10.10.1.4 0.0.0.3 area 0
+ network 10.10.10.0 0.0.0.3 area 0

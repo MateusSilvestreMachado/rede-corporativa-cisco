@@ -1,0 +1,93 @@
+! ============================================
+! Servidor Central de Serviços - VLAN 100 (Prédio 1)
+! ============================================
+
+--------------------------------------------------
+IP CONFIGURATION (Estático)
+--------------------------------------------------
+IP Address:      192.168.100.10
+Subnet Mask:     255.255.255.0
+Default Gateway: 192.168.100.1
+DNS Server:      192.168.100.10
+
+
+--------------------------------------------------
+DHCP - Pools de Endereçamento
+--------------------------------------------------
+Cada pool atende uma VLAN/departamento específico, via DHCP Relay
+(ip helper-address configurado nas SVIs dos switches multilayer).
+
+Pool Name: P1-HR
+  Default Gateway:     192.168.10.1
+  DNS Server:          192.168.100.10
+  Start IP Address:    192.168.10.100
+  Subnet Mask:         255.255.255.0
+  Maximum Number of Users: 100
+
+Pool Name: P1-Sales
+  Default Gateway:     192.168.20.1
+  DNS Server:          192.168.100.10
+  Start IP Address:    192.168.20.100
+  Subnet Mask:         255.255.255.0
+  Maximum Number of Users: 100
+
+Pool Name: P1-FINANCE
+  Default Gateway:     192.168.30.1
+  DNS Server:          192.168.100.10
+  Start IP Address:    192.168.30.100
+  Subnet Mask:         255.255.255.0
+  Maximum Number of Users: 100
+
+Pool Name: P2-HR
+  Default Gateway:     192.168.40.1
+  DNS Server:          192.168.100.10
+  Start IP Address:    192.168.40.100
+  Subnet Mask:         255.255.255.0
+  Maximum Number of Users: 100
+
+Pool Name: P2-SALES
+  Default Gateway:     192.168.50.1
+  DNS Server:          192.168.100.10
+  Start IP Address:    192.168.50.100
+  Subnet Mask:         255.255.255.0
+  Maximum Number of Users: 100
+
+Pool Name: P2-FINANCE
+  Default Gateway:     192.168.60.1
+  DNS Server:          192.168.100.10
+  Start IP Address:    192.168.60.100
+  Subnet Mask:         255.255.255.0
+  Maximum Number of Users: 100
+
+
+--------------------------------------------------
+DNS
+--------------------------------------------------
+Name:    compania.local
+Address: 192.168.100.10
+
+
+--------------------------------------------------
+HTTP - index.html
+--------------------------------------------------
+<html>
+<head>
+<title>Enterprise Headquarters</title>
+</head>
+<body bgcolor="white">
+<center>
+<h1>Enterprise Headquarters</h1>
+<h3>Network Services Portal</h3>
+</center>
+<hr>
+<p><b>Server Status:</b> Online</p>
+<p>Services Available:</p>
+<ul>
+<li>DHCP Server</li>
+<li>DNS Server</li>
+<li>Web Server</li>
+</ul>
+<p>Network: 192.168.100.0/24</p>
+<p>Welcome to the Enterprise Network Lab built in Cisco Packet Tracer.</p>
+</body>
+</html>
